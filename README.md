@@ -16,6 +16,8 @@ $ docker run -it -name voice_api -p 5000:5000 voice_api /bin/bash
 $ brew install ffmpeg # macos
 $ sudo apt-get install ffmpeg # ubuntu
 
+$ python -m venv [env name]
+$ source [env name]/bin/activate
 $ pip install -r requirement.txt
 
 $ sh start.sh
