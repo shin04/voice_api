@@ -4,7 +4,7 @@ import json
 import os
 
 from middleware.check_file import allwed_file
-from middleware.extract_info import main
+from middleware import extract_info
 
 app = Flask(__name__)
 
@@ -29,10 +29,9 @@ def analyze():
         return jsonify(res)
 
     if file and allwed_file(file.filename, app.config):
-        print('ok')
         filename = file.filename
         file.save(os.path.join('voices/', filename))
-        res = main(filename, app.config)
+        res = extract_info.main(filename, app.config)
         res['success'] = True
         res['message'] = 'success'
         return jsonify(res)
