@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify, abort
+from flask_cors import CORS
 
 import json
 import os
@@ -7,6 +8,7 @@ from middleware.check_file import allwed_file
 from middleware import extract_info
 
 app = Flask(__name__)
+CORS(app)
 
 app.config.from_json('config/app_config.json')
 
@@ -36,5 +38,6 @@ def analyze():
         res['message'] = 'success'
         return jsonify(res)
 
-# app.run()
-app.run(debug=True)
+if __name__== '__main__':
+    # app.run()
+    app.run(host='0.0.0.0', debug=True)

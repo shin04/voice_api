@@ -45,8 +45,6 @@ def extract_speed(file_path):
     res = {}
     res['speaking_rate'] = speaking_rate
 
-    print(speaking_time)
-
     return res
 
 def extract_pitch_and_db(sound):
@@ -67,7 +65,6 @@ def extract_pitch_and_db(sound):
     # res['sp'] = sp.tolist()
     # res['ap'] = ap.tolist()
 
-    print(_time)
     return res
 
 def main(filename, cfg):
