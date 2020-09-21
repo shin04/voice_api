@@ -8,7 +8,7 @@ Environment construction and server startup
 ```
 $ docker build -t voice_api .
 
-$ docker run -it -name voice_api -p 5000:5000 voice_api /bin/bash
+$ docker run -it --name voice_api -p 5000:5000 voice_api /bin/bash
 ```
 
 ### dont use docker

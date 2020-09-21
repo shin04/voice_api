@@ -12,6 +12,8 @@ CORS(app)
 
 app.config.from_json('config/app_config.json')
 
+# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '../voice-recognition-288501-df448cb420f2.json'
+
 @app.route('/', methods=['GET'])
 def hello():
     return jsonify({'message': 'hello world'})

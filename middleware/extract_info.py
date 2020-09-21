@@ -50,15 +50,18 @@ def extract_speed(file_path):
 def extract_pitch_and_db(sound):
     fs = sound.frame_rate
     data = np.array(sound.get_array_of_samples()).astype(np.float)
+    data = data / 32768.0
 
-    db = sound.rms # デシベル
-    db_max = sound.max
+    amplitude = data # 振幅
+    db = sound.rms # デシベル（平均）
+    db_max = sound.max # デシベル（最大）
     _f0, _time = pw.dio(data, fs)    # 基本周波数の抽出
     f0 = pw.stonemask(data, _f0, _time, fs)  # 基本周波数の修正
     # sp = pw.cheaptrick(data, f0, _time, fs)  # スペクトル包絡の抽出
     # ap = pw.d4c(data, f0, _time, fs)  # 非周期性指標の抽出
 
     res = {}
+    res['amplitude'] = amplitude.tolist()[:1000]
     res['db'] = db
     res['db_max'] = db_max
     res['f0'] = f0.tolist()
