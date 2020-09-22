@@ -12,6 +12,7 @@ CORS(app)
 
 app.config.from_json('config/app_config.json')
 
+os.makedirs(app.config['FILE_PATH'], exist_ok=True)
 # os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '../voice-recognition-288501-df448cb420f2.json'
 
 @app.route('/', methods=['GET'])
@@ -24,7 +25,7 @@ def analyze():
         print('file not found')
         res = {'success': True, 'message': 'file not found'}
         return jsonify(res)
-    
+
     file = request.files['files']
 
     if file.filename == '':
@@ -34,7 +35,7 @@ def analyze():
 
     if file and allwed_file(file.filename, app.config):
         filename = file.filename
-        file.save(os.path.join('voices/', filename))
+        file.save(os.path.join(app.config['FILE_PATH'], filename))
         res = extract_info.main(filename, app.config)
         res['success'] = True
         res['message'] = 'success'
