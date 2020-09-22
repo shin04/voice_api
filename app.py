@@ -13,7 +13,7 @@ CORS(app)
 app.config.from_json('config/app_config.json')
 
 os.makedirs(app.config['FILE_PATH'], exist_ok=True)
-# os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '../voice-recognition-288501-df448cb420f2.json'
+os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '../voice-recognition-288501-df448cb420f2.json'
 
 @app.route('/', methods=['GET'])
 def hello():

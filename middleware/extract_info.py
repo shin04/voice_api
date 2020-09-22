@@ -61,7 +61,7 @@ def extract_pitch_and_db(sound):
     # ap = pw.d4c(data, f0, _time, fs)  # 非周期性指標の抽出
 
     res = {}
-    res['amplitude'] = amplitude.tolist()[:1000]
+    # res['amplitude'] = amplitude.tolist()[:1000]
     res['db'] = db
     res['db_max'] = db_max
     res['f0'] = f0.tolist()
