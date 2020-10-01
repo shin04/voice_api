@@ -15,9 +15,11 @@ app.config.from_json('config/app_config.json')
 os.makedirs(app.config['FILE_PATH'], exist_ok=True)
 os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '../voice-recognition-288501-df448cb420f2.json'
 
+
 @app.route('/', methods=['GET'])
 def hello():
     return jsonify({'message': 'hello world'})
+
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
@@ -41,6 +43,7 @@ def analyze():
         res['message'] = 'success'
         return jsonify(res)
 
-if __name__== '__main__':
+
+if __name__ == '__main__':
     # app.run()
     app.run(host='0.0.0.0', debug=True)
