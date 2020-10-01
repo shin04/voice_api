@@ -8,9 +8,10 @@ import numpy as np
 
 import os
 import io
+import re
 
 
-def extract_speed(file_path):
+def get_googleapi_res(file_path):
     audio = MP3(file_path)
     speaking_time = audio.info.length
 
@@ -23,6 +24,8 @@ def extract_speed(file_path):
         "language_code": language_code,
         "sample_rate_hertz": sample_rate_hertz,
         "encoding": encoding,
+        "enable_speaker_diarization": True,
+        "diarization_speaker_count": 2
     }
 
     with io.open(file_path, "rb") as f:
@@ -30,6 +33,42 @@ def extract_speed(file_path):
     audio = {"content": content}
     response = client.recognize(config, audio)
 
+    return response, speaking_time
+
+
+def separate_people(response):
+    result = response.results[-1]
+    words_info = result.alternatives[0].words
+
+    people_infos = []
+    for _ in range(2):
+        person_infos = []
+        people_infos.append(person_infos)
+    for word_info in words_info:
+        m = re.search(r'(.*)\|.*$', word_info.word)
+        word = m.group(1)
+        speaker_tag = int(word_info.speaker_tag)
+        start_time = float(word_info.start_time.seconds) + \
+            float(word_info.start_time.nanos)/(10**9)
+        stop_time = float(word_info.end_time.seconds) + \
+            float(word_info.end_time.nanos)/(10**9)
+
+        if len(people_infos[speaker_tag-1]) != 0 and people_infos[speaker_tag-1][-1]["stop_time"] == start_time:
+            people_infos[speaker_tag-1][-1]["word"] += word
+            people_infos[speaker_tag-1][-1]["stop_time"] = stop_time
+        else:
+            person_info = {
+                "word": word,
+                "speaker_tag": speaker_tag,
+                "start_time": start_time,
+                "stop_time": stop_time
+            }
+            people_infos[speaker_tag-1].append(person_info)
+
+    return people_infos
+
+
+def extract_speed(response, speaking_time):
     transcripts = []
     for result in response.results:
         alternative = result.alternatives[0]
@@ -85,6 +124,9 @@ def extract_pitch_and_db(sound):
 
 def main(filename, cfg):
     file_path = cfg['FILE_PATH'] + '/' + filename
+    response, speaking_time = get_googleapi_res(file_path)
+    people_info = separate_people(response)
+    print(people_info)
 
     res = {}
 
@@ -94,7 +136,8 @@ def main(filename, cfg):
     sound = AudioSegment.from_file(file_path, 'mp3')
     res_1 = extract_pitch_and_db(sound)
     res.update(res_1)
-    res_2 = extract_speed(file_path)
+
+    res_2 = extract_speed(response, speaking_time)
     res.update(res_2)
 
     os.remove(file_path)
