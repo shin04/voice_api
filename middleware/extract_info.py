@@ -68,6 +68,23 @@ def separate_people(response, people_num):
     return people_infos
 
 
+def get_speaking_time(people_infos):
+    speaking_times = []
+    for person_infos in people_infos:
+        speaking_times_dict = {}
+        speaking_times_dict[person_infos[0]['speaker_tag']] = []
+        for person_info in person_infos:
+            person_speaking_times = [
+                person_info["start_time"],
+                person_info["stop_time"]
+            ]
+            speaking_times_dict[person_info["speaker_tag"]].append(
+                person_speaking_times)
+        speaking_times.append(speaking_times_dict)
+
+    return speaking_times
+
+
 def calc_speed(people_infos):
     res = []
     for i, person_infos in enumerate(people_infos):
@@ -130,6 +147,8 @@ def main(filename, cfg, people_num):
     speaking_rates = calc_speed(people_infos)
     sounds_by_person = extract_sound_by_person(people_infos, sound)
 
+    speaking_times = get_speaking_time(people_infos)
+
     pitches = []
     amplitudes = []
     for speaker_tag, person_sounds in sounds_by_person.items():
@@ -147,6 +166,7 @@ def main(filename, cfg, people_num):
     if not os.path.exists(file_path):
         return res
 
+    res['speaking_time'] = speaking_times
     res['amplitude'] = amplitudes
     res['pitch'] = pitch
     res['speaking_rate'] = speaking_rates
