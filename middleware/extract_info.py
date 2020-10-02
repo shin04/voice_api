@@ -68,24 +68,40 @@ def separate_people(response):
     return people_infos
 
 
-def extract_speed(response, speaking_time):
-    transcripts = []
-    for result in response.results:
-        alternative = result.alternatives[0]
-        transcripts.append(alternative.transcript)
-
-    word_counts = [0] * len(transcripts)
-    for i, sentence in enumerate(transcripts):
-        word_counts[i] = len(sentence)
-
-    speaking_rate = []
-    for i in range(len(transcripts)):
-        speaking_rate.append(word_counts[i]/speaking_time)
-
-    res = {}
-    res['speaking_rate'] = speaking_rate
+def calc_speed(people_infos):
+    res = []
+    for i, person_infos in enumerate(people_infos):
+        time = 0.
+        words = ""
+        for person_info in person_infos:
+            time += person_info['stop_time'] - person_info['start_time']
+            words += person_info['word']
+        speaking_rate = 0.
+        if time != 0.:
+            speaking_rate = len(words) / time
+        res.append({str(i+1): speaking_rate})
 
     return res
+
+
+# def extract_speed(response, speaking_time):
+#     transcripts = []
+#     for result in response.results:
+#         alternative = result.alternatives[0]
+#         transcripts.append(alternative.transcript)
+
+#     word_counts = [0] * len(transcripts)
+#     for i, sentence in enumerate(transcripts):
+#         word_counts[i] = len(sentence)
+
+#     speaking_rate = []
+#     for i in range(len(transcripts)):
+#         speaking_rate.append(word_counts[i]/speaking_time)
+
+#     res = {}
+#     res['speaking_rate'] = speaking_rate
+
+#     return res
 
 
 # def to_db(x, N):
@@ -125,8 +141,9 @@ def extract_pitch_and_db(sound):
 def main(filename, cfg):
     file_path = cfg['FILE_PATH'] + '/' + filename
     response, speaking_time = get_googleapi_res(file_path)
-    people_info = separate_people(response)
-    print(people_info)
+    people_infos = separate_people(response)
+    print(people_infos)
+    print(calc_speed(people_infos))
 
     res = {}
 
@@ -137,8 +154,8 @@ def main(filename, cfg):
     res_1 = extract_pitch_and_db(sound)
     res.update(res_1)
 
-    res_2 = extract_speed(response, speaking_time)
-    res.update(res_2)
+    # res_2 = extract_speed(response, speaking_time)
+    # res.update(res_2)
 
     os.remove(file_path)
 
