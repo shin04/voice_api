@@ -6,4 +6,4 @@ credentials/
 
 config/aws.json
 
-middleware/__pycache__/
+__pycache__
