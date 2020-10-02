@@ -18,14 +18,14 @@ class TestStatusCode(unittest.TestCase):
     def test_hello(self):
         print('[GET] /')
         res = self.client.get('/')
-        self.assertEqual(res.status, '200 OK')
+        self.assertEqual(res.status_code, 200)
 
     def test_analyze(self):
         print('[POST] /analyze')
         res = self.client.post('/analyze', json={
             'people_num': 2
         })
-        self.assertEqual(res.status, '200 OK')
+        self.assertEqual(res.status_code, 400)
 
 
 if __name__ == '__main__':
