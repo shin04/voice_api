@@ -23,6 +23,8 @@ def hello():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
+    people_num = int(request.form['people_num'])
+
     if 'files' not in request.files:
         print('file not found')
         res = {'success': True, 'message': 'file not found'}
@@ -38,7 +40,7 @@ def analyze():
     if file and allwed_file(file.filename, app.config):
         filename = file.filename
         file.save(os.path.join(app.config['FILE_PATH'], filename))
-        res = extract_info.main(filename, app.config)
+        res = extract_info.main(filename, app.config, people_num)
         res['success'] = True
         res['message'] = 'success'
         return jsonify(res)

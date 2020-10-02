@@ -11,7 +11,7 @@ import io
 import re
 
 
-def get_googleapi_res(file_path):
+def get_googleapi_res(file_path, people_num):
     audio = MP3(file_path)
     speaking_time = audio.info.length
 
@@ -25,7 +25,7 @@ def get_googleapi_res(file_path):
         "sample_rate_hertz": sample_rate_hertz,
         "encoding": encoding,
         "enable_speaker_diarization": True,
-        "diarization_speaker_count": 2
+        "diarization_speaker_count": people_num
     }
 
     with io.open(file_path, "rb") as f:
@@ -36,12 +36,12 @@ def get_googleapi_res(file_path):
     return response, speaking_time
 
 
-def separate_people(response):
+def separate_people(response, people_num):
     result = response.results[-1]
     words_info = result.alternatives[0].words
 
     people_infos = []
-    for _ in range(2):
+    for _ in range(people_num):
         person_infos = []
         people_infos.append(person_infos)
     for word_info in words_info:
@@ -118,11 +118,11 @@ def extract_sound_by_person(people_infos, sound):
     return sounds
 
 
-def main(filename, cfg):
+def main(filename, cfg, people_num):
     file_path = cfg['FILE_PATH'] + '/' + filename
 
-    response, _ = get_googleapi_res(file_path)
-    people_infos = separate_people(response)
+    response, _ = get_googleapi_res(file_path, people_num)
+    people_infos = separate_people(response, people_num)
 
     sound = AudioSegment.from_file(file_path, 'mp3')
     # data, fs = sound_to_numpy(sound)
