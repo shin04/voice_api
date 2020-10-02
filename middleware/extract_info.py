@@ -84,66 +84,72 @@ def calc_speed(people_infos):
     return res
 
 
-# def extract_speed(response, speaking_time):
-#     transcripts = []
-#     for result in response.results:
-#         alternative = result.alternatives[0]
-#         transcripts.append(alternative.transcript)
-
-#     word_counts = [0] * len(transcripts)
-#     for i, sentence in enumerate(transcripts):
-#         word_counts[i] = len(sentence)
-
-#     speaking_rate = []
-#     for i in range(len(transcripts)):
-#         speaking_rate.append(word_counts[i]/speaking_time)
-
-#     res = {}
-#     res['speaking_rate'] = speaking_rate
-
-#     return res
-
-
 def sound_to_numpy(sound):
     fs = sound.frame_rate
-    data = np.array(sound.get_array_of_samples()).astype(np.float)
+    # data = np.array(sound.get_array_of_samples()).astype(np.float)
+    data = np.array(sound.get_array_of_samples())
     # data = data / 32768.0
     return data, fs
 
 
 def extract_pitch(data, fs):
-    _f0, _time = pw.dio(data, fs)    # 基本周波数の抽出
-    f0 = pw.stonemask(data, _f0, _time, fs)  # 基本周波数の修正
+    _f0, _time = pw.dio(data.astype(np.float), fs)    # 基本周波数の抽出
+    f0 = pw.stonemask(data.astype(np.float), _f0, _time, fs)  # 基本周波数の修正
     # sp = pw.cheaptrick(data, f0, _time, fs)  # スペクトル包絡の抽出
     # ap = pw.d4c(data, f0, _time, fs)  # 非周期性指標の抽出
 
-    res = {}
-    res['f0'] = f0.tolist()
-    # res['sp'] = sp.tolist()
-    # res['ap'] = ap.tolist()
+    return f0.tolist()
 
-    return res
+
+def extract_sound_by_person(people_infos, sound):
+    sounds = {}
+    for i, person_infos in enumerate(people_infos):
+        person_sounds = []
+        for person_info in person_infos:
+            start_time = person_info['start_time']  # s
+            stop_time = person_info['stop_time']    # s
+
+            sec_sound = sound[start_time*1000:stop_time*1000]
+            # sec_sound.export("sound_1.mp3", format="mp3")
+            person_sounds.append(sec_sound)
+        # sounds.append({str(i+1): person_sounds})
+        sounds[str(i+1)] = person_sounds
+
+    return sounds
 
 
 def main(filename, cfg):
     file_path = cfg['FILE_PATH'] + '/' + filename
+
     response, _ = get_googleapi_res(file_path)
     people_infos = separate_people(response)
-    print(calc_speed(people_infos))
+
+    sound = AudioSegment.from_file(file_path, 'mp3')
+    # data, fs = sound_to_numpy(sound)
+
+    speaking_rates = calc_speed(people_infos)
+    sounds_by_person = extract_sound_by_person(people_infos, sound)
+
+    pitches = []
+    amplitudes = []
+    for speaker_tag, person_sounds in sounds_by_person.items():
+        person_pitches = []
+        person_amplitudes = []
+        for sound in person_sounds:
+            data, fs = sound_to_numpy(sound)
+            pitch = extract_pitch(data, fs)
+            person_pitches.append(pitch)
+            person_amplitudes.append(data.tolist())
+        pitches.append({speaker_tag: person_pitches})
+        amplitudes.append({speaker_tag: person_amplitudes})
 
     res = {}
     if not os.path.exists(file_path):
         return res
-    sound = AudioSegment.from_file(file_path, 'mp3')
-    data, fs = sound_to_numpy(sound)
 
-    res['amplitude'] = data.tolist()
-
-    pitch_res = extract_pitch(data, fs)
-    res.update(pitch_res)
-
-    # res_2 = extract_speed(response, speaking_time)
-    # res.update(res_2)
+    res['amplitude'] = amplitudes
+    res['pitch'] = pitch
+    res['speaking_rate'] = speaking_rates
 
     os.remove(file_path)
 
