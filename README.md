@@ -1,10 +1,15 @@
 # Set Up
+
 ## 1.
+
 Add to credential json file to credentials folder
 
-## 2. 
+## 2.
+
 Environment construction and server startup
+
 ### use docker
+
 ```
 $ docker build -t voice_api .
 
@@ -12,6 +17,7 @@ $ docker run -it --name voice_api -p 5000:5000 voice_api /bin/bash
 ```
 
 ### dont use docker
+
 ```
 $ brew install ffmpeg # macos
 $ sudo apt-get install ffmpeg # ubuntu
@@ -24,19 +30,41 @@ $ sh start.sh
 ```
 
 # Usage
+
 ## localhost:5000/analyze
+
 params
+
 ```
 files: mp3 file
+person_num: number of speakers
 ```
 
 response
+
 ```
 {
-    "db": 0, # 音量
-    "db_max": 0, # 最大音量
-    "f0": [], # 基本周波数（高さ）
-    "speaking_rate": [], # 発話速度
+    "amplitude": [
+        {
+            "1"(speaker_tag): [
+                    [amplitude list (float)],
+                    ...
+                ]
+        },
+        ...
+    ],
+    "pitch": [
+        {
+            "1"(speaker_tag): [
+                    [amplitude list (float)],
+                    ...
+                ]
+        },
+        ...
+    ]
+    "speaking_rate": [
+        {"1"(speaker_tag): speaking_rate(float)}
+    ],
     "message": "success",
     "success": true
 }
