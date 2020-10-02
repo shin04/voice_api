@@ -63,8 +63,13 @@ response
         ...
     ]
     "speaking_rate": [
-        {"1"(speaker_tag): speaking_rate(float)}
+        {"1"(speaker_tag): speaking_rate(float)},
+        ...
     ],
+    speaking_time: [
+        {speaker_tag: [[0,1],[3,5],,,[start_time, stop_time]]},
+        ...
+    ]
     "message": "success",
     "success": true
 }
