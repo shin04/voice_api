@@ -23,7 +23,7 @@ class TestStatusCode(unittest.TestCase):
 
     def test_analyze(self):
         print('[POST] /analyze')
-        res = self.client.post('/analyze', json={
+        res = self.client.post('/analyze', data={
             'people_num': 2
         })
         json_data = res.get_json()
