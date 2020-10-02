@@ -50,7 +50,7 @@ def analyze():
     if file and allwed_file(file.filename, app.config):
         filename = file.filename
         file.save(os.path.join(app.config['FILE_PATH'], filename))
-        res = extract_info.main(filename, app.config, people_num)
+        res = extract_info.extract_info(filename, app.config, people_num)
         return jsonify(res)
     elif allwed_file(file.filename, app.config):
         abort(400, {'message': 'extension is invalid'})

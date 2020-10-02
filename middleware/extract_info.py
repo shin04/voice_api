@@ -135,7 +135,7 @@ def extract_sound_by_person(people_infos, sound):
     return sounds
 
 
-def main(filename, cfg, people_num):
+def extract_info(filename, cfg, people_num):
     file_path = cfg['FILE_PATH'] + '/' + filename
 
     response, _ = get_googleapi_res(file_path, people_num)
