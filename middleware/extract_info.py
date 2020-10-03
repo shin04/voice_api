@@ -11,9 +11,9 @@ import io
 import re
 
 
-def get_googleapi_res(file_path, people_num):
-    audio = MP3(file_path)
-    speaking_time = audio.info.length
+def get_googleapi_res(file, file_path, people_num):
+    # audio = MP3(file_path)
+    # speaking_time = audio.info.length
 
     client = speech_v1p1beta1.SpeechClient()
 
@@ -30,10 +30,11 @@ def get_googleapi_res(file_path, people_num):
 
     with io.open(file_path, "rb") as f:
         content = f.read()
+    # content = file.read()
     audio = {"content": content}
     response = client.recognize(config, audio)
 
-    return response, speaking_time
+    return response
 
 
 def separate_people(response, people_num):
@@ -135,13 +136,14 @@ def extract_sound_by_person(people_infos, sound):
     return sounds
 
 
-def extract_info(filename, cfg, people_num):
+def extract_info(file, filename, cfg, people_num):
     file_path = cfg['FILE_PATH'] + '/' + filename
 
-    response, _ = get_googleapi_res(file_path, people_num)
+    response = get_googleapi_res(file, file_path, people_num)
     people_infos = separate_people(response, people_num)
 
-    sound = AudioSegment.from_file(file_path, 'mp3')
+    # sound = AudioSegment.from_file(file_path, 'mp3')
+    sound = AudioSegment.from_mp3(io.BytesIO(file))
     # data, fs = sound_to_numpy(sound)
 
     speaking_rates = calc_speed(people_infos)
@@ -163,15 +165,15 @@ def extract_info(filename, cfg, people_num):
         amplitudes.append({speaker_tag: person_amplitudes})
 
     res = {}
-    if not os.path.exists(file_path):
-        return res
+    # if not os.path.exists(file_path):
+    #     return res
 
     res['speaking_time'] = speaking_times
     res['amplitude'] = amplitudes
     res['pitch'] = pitch
     res['speaking_rate'] = speaking_rates
 
-    os.remove(file_path)
+    # os.remove(file_path)
 
     return res
 
