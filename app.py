@@ -42,17 +42,17 @@ def analyze():
 
     if 'files' not in request.files:
         abort(400, {'message': 'parameter [file] is not found'})
-    file = request.files['files']
+    voice_file = request.files['files']
 
-    if file.filename == '':
+    if voice_file.filename == '':
         abort(400, {'message': 'file is not found'})
 
-    if file and allwed_file(file.filename, app.config):
-        filename = file.filename
-        file.save(os.path.join(app.config['FILE_PATH'], filename))
-        res = extract_info.extract_info(file, filename, app.config, people_num)
+    if voice_file and allwed_file(voice_file.filename, app.config):
+        filename = voice_file.filename
+        res = extract_info.extract_info(
+            voice_file, filename, app.config, people_num)
         return jsonify(res)
-    elif allwed_file(file.filename, app.config):
+    elif allwed_file(voice_file.filename, app.config):
         abort(400, {'message': 'extension is invalid'})
     else:
         abort(400, {'message': 'unknown error'})

@@ -11,10 +11,7 @@ import io
 import re
 
 
-def get_googleapi_res(file, file_path, people_num):
-    # audio = MP3(file_path)
-    # speaking_time = audio.info.length
-
+def get_googleapi_res(voice_byte, people_num):
     client = speech_v1p1beta1.SpeechClient()
 
     language_code = "ja-JP"
@@ -28,9 +25,7 @@ def get_googleapi_res(file, file_path, people_num):
         "diarization_speaker_count": people_num
     }
 
-    with io.open(file_path, "rb") as f:
-        content = f.read()
-    # content = file.read()
+    content = voice_byte
     audio = {"content": content}
     response = client.recognize(config, audio)
 
@@ -136,14 +131,14 @@ def extract_sound_by_person(people_infos, sound):
     return sounds
 
 
-def extract_info(file, filename, cfg, people_num):
-    file_path = cfg['FILE_PATH'] + '/' + filename
-
-    response = get_googleapi_res(file, file_path, people_num)
+def extract_info(voice_file, filename, cfg, people_num):
+    voice_byte = voice_file.read()
+    response = get_googleapi_res(voice_byte, people_num)
     people_infos = separate_people(response, people_num)
 
-    # sound = AudioSegment.from_file(file_path, 'mp3')
-    sound = AudioSegment.from_mp3(io.BytesIO(file))
+    sound = AudioSegment.from_mp3(io.BytesIO(voice_byte))
+    # sound = AudioSegment(voice_file.read(), sample_width=2,
+    #                      frame_rate=44100, channels=2)
     # data, fs = sound_to_numpy(sound)
 
     speaking_rates = calc_speed(people_infos)
