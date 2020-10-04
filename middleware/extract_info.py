@@ -137,8 +137,6 @@ def extract_info(voice_file, filename, cfg, people_num):
     people_infos = separate_people(response, people_num)
 
     sound = AudioSegment.from_mp3(io.BytesIO(voice_byte))
-    # sound = AudioSegment(voice_file.read(), sample_width=2,
-    #                      frame_rate=44100, channels=2)
     # data, fs = sound_to_numpy(sound)
 
     speaking_rates = calc_speed(people_infos)
@@ -160,15 +158,11 @@ def extract_info(voice_file, filename, cfg, people_num):
         amplitudes.append({speaker_tag: person_amplitudes})
 
     res = {}
-    # if not os.path.exists(file_path):
-    #     return res
 
     res['speaking_time'] = speaking_times
     res['amplitude'] = amplitudes
     res['pitch'] = pitch
     res['speaking_rate'] = speaking_rates
-
-    # os.remove(file_path)
 
     return res
 
