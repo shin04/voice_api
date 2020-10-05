@@ -20,11 +20,15 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         pip install -r requirement.txt
+    - name: Set Google Aplication Credentials
+      env:
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGlE_APPLICATION_CREDENTIAlS }}
+        GOOGle_APPLICATION_CREDENTIALS: ./credentials/voice-recognition-288501-df448cb420f2.json
+      run: |
+        echo ${GOOGLE_APPLICATION_CREDENTIALS_JSON} > ${GOOGLE_APPLICATION_CREDENTIALS}
     - name: Test Response
       run: FLASK_ENV=test python test_response.py
       working-directory: ./test
     - name: Test StatusCode
       run: FLASK_ENV=test python test_statuscode.py
       working-directory: ./test
-    env:
-      GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
