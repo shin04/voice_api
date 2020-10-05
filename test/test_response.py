@@ -12,6 +12,7 @@ class TestStatusCode(unittest.TestCase):
         print('Start Test About Response Body')
         app.app.config['TESTING'] = True
         app.app.config.from_json('config/app_config.json')
+        os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = '../credentials/voice-recognition-288501-df448cb420f2.json'
         self.client = app.app.test_client()
 
     def tearDown(self):
