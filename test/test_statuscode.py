@@ -24,7 +24,7 @@ class TestStatusCode(unittest.TestCase):
 
     def test_analyze(self):
         print('[POST] /analyze')
-        file_name = './voices/sample1.mp3'
+        file_name = './sample_voices/sample1.mp3'
         with io.open(file_name, 'rb') as audio_file:
             content = audio_file.read()
         voice_file = (io.BytesIO(content), 'test.mp3')
