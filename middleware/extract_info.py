@@ -161,7 +161,7 @@ def extract_info(voice_file, filename, cfg, people_num):
 
     res['speaking_time'] = speaking_times
     res['amplitude'] = amplitudes
-    res['pitch'] = pitch
+    res['pitch'] = pitches
     res['speaking_rate'] = speaking_rates
 
     return res

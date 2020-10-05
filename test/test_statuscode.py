@@ -1,5 +1,6 @@
 import unittest
 import sys
+import io
 import os
 sys.path.append(os.path.abspath(".."))
 
@@ -10,6 +11,7 @@ class TestStatusCode(unittest.TestCase):
     def setUp(self):
         print('Start Test About Status Code')
         app.app.config['TESTING'] = True
+        app.app.config.from_json('config/app_config.json')
         self.client = app.app.test_client()
 
     def tearDown(self):
@@ -22,10 +24,15 @@ class TestStatusCode(unittest.TestCase):
 
     def test_analyze(self):
         print('[POST] /analyze')
-        res = self.client.post('/analyze', json={
-            'people_num': 2
+        file_name = './voices/sample1.mp3'
+        with io.open(file_name, 'rb') as audio_file:
+            content = audio_file.read()
+        voice_file = (io.BytesIO(content), 'test.mp3')
+        res = self.client.post('/analyze', data={
+            'files': voice_file,
+            'people_num': 1
         })
-        self.assertEqual(res.status_code, 400)
+        self.assertEqual(res.status_code, 200)
 
 
 if __name__ == '__main__':
