@@ -21,10 +21,10 @@ jobs:
         python -m pip install --upgrade pip
         pip install -r requirement.txt
     - name: Test Response
-      run: python test_response.py
+      run: FLASK_ENV=test python test_response.py
       working-directory: ./test
     - name: Test StatusCode
-      run: python test_statuscode.py
+      run: FLASK_ENV=test python test_statuscode.py
       working-directory: ./test
     env:
       GOOGLE_APPLICATION_CREDENTIALS: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
