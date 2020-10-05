@@ -26,5 +26,5 @@ jobs:
     - name: Test StatusCode
       run: python test_statuscode.py
       working-directory: ./test
-    - env:
-        GOOGLE_APPLICATION_CREDENTIALS: ${{ secret.GOOGLE_APPLICATION_CREDENTIALS }}
+    env:
+      GOOGLE_APPLICATION_CREDENTIALS: ${{ secret.GOOGLE_APPLICATION_CREDENTIALS }}
