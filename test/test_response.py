@@ -1,5 +1,6 @@
 import unittest
 import sys
+import io
 import os
 sys.path.append(os.path.abspath(".."))
 
@@ -23,6 +24,7 @@ class TestStatusCode(unittest.TestCase):
 
     def test_analyze(self):
         print('[POST] /analyze')
+        voice_file = (io.BytesIO(b'this is test mp3'), 'test.mp3')
         res = self.client.post('/analyze', data={
             'people_num': 2
         })
