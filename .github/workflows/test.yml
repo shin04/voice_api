@@ -22,8 +22,8 @@ jobs:
         pip install -r requirement.txt
     - name: Set Google Aplication Credentials
       env:
-        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGlE_APPLICATION_CREDENTIAlS }}
-        GOOGle_APPLICATION_CREDENTIALS: ./credentials/voice-recognition-288501-df448cb420f2.json
+        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+        GOOGLE_APPLICATION_CREDENTIALS: ./credentials/voice-recognition-288501-df448cb420f2.json
       run: |
         echo ${GOOGLE_APPLICATION_CREDENTIALS_JSON} > ${GOOGLE_APPLICATION_CREDENTIALS}
     - name: Test Response
