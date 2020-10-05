@@ -23,8 +23,9 @@ jobs:
     - name: Set Google Aplication Credentials
       env:
         GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        GOOGLE_APPLICATION_CREDENTIALS: ./credentials/voice-recognition-288501-df448cb420f2.json
+        GOOGLE_APPLICATION_CREDENTIALS: credentials/voice-recognition-288501-df448cb420f2.json
       run: |
+        pwd
         touch ${GOOGLE_APPLICATION_CREDENTIALS}
         echo ${GOOGLE_APPLICATION_CREDENTIALS_JSON} > ${GOOGLE_APPLICATION_CREDENTIALS}
     - name: Test Response
