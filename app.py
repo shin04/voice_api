@@ -10,15 +10,6 @@ from middleware import extract_info
 app = Flask(__name__)
 CORS(app)
 
-app.config.from_json('config/app_config.json')
-os.makedirs(app.config['FILE_PATH'], exist_ok=True)
-
-# 環境の切り替え
-if app.env != 'test':
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/voice-recognition-288501-df448cb420f2.json'
-
-print(os.environ['GOOGLE_APPLICATION_CREDENTIALS'])
-
 
 @app.errorhandler(400)
 def error_handler(error):
@@ -63,5 +54,9 @@ def analyze():
 
 
 if __name__ == '__main__':
-    # app.run()
+    # 環境の切り替え
+    app.config.from_json('config/app_config.json')
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/voice-recognition-288501-df448cb420f2.json'
+    os.makedirs(app.config['FILE_PATH'], exist_ok=True)
+
     app.run(host='0.0.0.0', debug=True)
