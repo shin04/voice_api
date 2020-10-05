@@ -25,6 +25,7 @@ jobs:
         GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
         GOOGLE_APPLICATION_CREDENTIALS: ./credentials/voice-recognition-288501-df448cb420f2.json
       run: |
+        touch ${GOOGLE_APPLICATION_CREDENTIALS}
         echo ${GOOGLE_APPLICATION_CREDENTIALS_JSON} > ${GOOGLE_APPLICATION_CREDENTIALS}
     - name: Test Response
       run: FLASK_ENV=test python test_response.py
