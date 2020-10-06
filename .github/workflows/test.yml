@@ -4,36 +4,35 @@ on: [pull_request]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
     strategy:
       matrix:
         python-version: [3.6, 3.7, 3.8]
 
     steps:
-    - uses: actions/checkout@v2
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v2
-      with:
-        python-version: ${{ matrix.python-version }}
-    - name: Install Dependencies
-      run: |
-        sudo apt update
-        sudo apt -y upgrade
-        sudo apt install ffmpeg
-        python -m pip install --upgrade pip
-        pip install -r requirement.txt
-    - name: Set Google Aplication Credentials
-      env:
-        GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
-        GOOGLE_APPLICATION_CREDENTIALS: credentials/voice-recognition-288501-df448cb420f2.json
-      run: |
-        mkdir credentials
-        touch ${GOOGLE_APPLICATION_CREDENTIALS}
-        echo ${GOOGLE_APPLICATION_CREDENTIALS_JSON} > ${GOOGLE_APPLICATION_CREDENTIALS}
-    - name: Test Response
-      run: FLASK_ENV=test python test_response.py
-      working-directory: ./test
-    - name: Test StatusCode
-      run: FLASK_ENV=test python test_statuscode.py
-      working-directory: ./test
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install Dependencies
+        run: |
+          sudo apt update
+          sudo apt -y upgrade
+          sudo apt install ffmpeg
+          python -m pip install --upgrade pip
+          pip install -r requirement.txt
+      - name: Set Google Aplication Credentials
+        env:
+          GOOGLE_APPLICATION_CREDENTIALS_JSON: ${{ secrets.GOOGLE_APPLICATION_CREDENTIALS }}
+          GOOGLE_APPLICATION_CREDENTIALS: credentials/voice-recognition.json
+        run: |
+          mkdir credentials
+          touch ${GOOGLE_APPLICATION_CREDENTIALS}
+          echo ${GOOGLE_APPLICATION_CREDENTIALS_JSON} > ${GOOGLE_APPLICATION_CREDENTIALS}
+      - name: Test Response
+        run: FLASK_ENV=test python test_response.py
+        working-directory: ./test
+      - name: Test StatusCode
+        run: FLASK_ENV=test python test_statuscode.py
+        working-directory: ./test

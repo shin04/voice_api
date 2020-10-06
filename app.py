@@ -56,7 +56,7 @@ def analyze():
 if __name__ == '__main__':
     # 環境の切り替え
     app.config.from_json('config/app_config.json')
-    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/voice-recognition-288501-df448cb420f2.json'
+    os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/voice-recognition.json'
     os.makedirs(app.config['FILE_PATH'], exist_ok=True)
 
     app.run(host='0.0.0.0', debug=True)
