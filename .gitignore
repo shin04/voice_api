@@ -4,6 +4,6 @@ voices/
 
 credentials/
 
-# config/aws.json
+config/aws.json
 
 __pycache__
