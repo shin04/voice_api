@@ -3,5 +3,4 @@ echo Setting...
 mkdir credentials
 touch credentials/voice-recognition.json
 echo ${GOOGLE_APPLICATION_CREDENTIALS} > credentials/voice-recognition.json
-test=`ls`
-echo "$test"
+python app.py
