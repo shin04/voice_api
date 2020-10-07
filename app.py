@@ -59,4 +59,5 @@ if __name__ == '__main__':
     os.environ['GOOGLE_APPLICATION_CREDENTIALS'] = 'credentials/voice-recognition.json'
     os.makedirs(app.config['FILE_PATH'], exist_ok=True)
 
-    app.run(host='0.0.0.0', debug=True)
+    port = int(os.environ.get('PORT', 5000))
+    app.run(host='0.0.0.0', port=port, debug=True)
