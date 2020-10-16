@@ -5,13 +5,51 @@ from google.cloud import speech_v1p1beta1
 from google.cloud.speech_v1p1beta1 import enums
 from mutagen.mp3 import MP3
 import numpy as np
+from scipy import signal
 
 import os
 import io
 import re
+import time
+
+
+def downsampling(conversion_rate, data, fs):
+    print('get downsampling time ...')
+    start = time.time()
+    """
+    ダウンサンプリングを行う．
+    入力として，変換レートとデータとサンプリング周波数．
+    ダウンサンプリング後のデータとサンプリング周波数を返す．
+    """
+    # 間引くサンプル数を決める
+    decimationSampleNum = conversion_rate-1
+
+    # FIRフィルタの用意をする
+    nyqF = fs/2.0             # 変換後のナイキスト周波数
+    # カットオフ周波数を設定（変換前のナイキスト周波数より少し下を設定）
+    cF = (fs/conversion_rate/2.0-500.)/nyqF
+    taps = 511                                  # フィルタ係数（奇数じゃないとだめ）
+    b = signal.firwin(taps, cF)           # LPFを用意
+
+    # フィルタリング
+    data = signal.lfilter(b, 1, data)
+
+    # 間引き処理
+    downData = []
+    for i in range(0, len(data), decimationSampleNum+1):
+        downData.append(data[i])
+
+    downData = np.array(downData)
+
+    print(f'time: {time.time() - start}')
+
+    return (downData, fs/conversion_rate)
 
 
 def get_googleapi_res(voice_byte, people_num):
+    print('get google api response ...')
+    start = time.time()
+
     client = speech_v1p1beta1.SpeechClient()
 
     language_code = "ja-JP"
@@ -28,6 +66,9 @@ def get_googleapi_res(voice_byte, people_num):
     content = voice_byte
     audio = {"content": content}
     response = client.recognize(config, audio)
+
+    pro_time = time.time() - start
+    print(f'processing time: {pro_time}')
 
     return response
 
@@ -84,25 +125,31 @@ def get_speaking_time(people_infos):
 def calc_speed(people_infos):
     res = []
     for i, person_infos in enumerate(people_infos):
-        time = 0.
+        speaking_time = 0.
         words = ""
         for person_info in person_infos:
-            time += person_info['stop_time'] - person_info['start_time']
+            speaking_time += person_info['stop_time'] - \
+                person_info['start_time']
             words += person_info['word']
         speaking_rate = 0.
-        if time != 0.:
-            speaking_rate = len(words) / time
+        if speaking_time != 0.:
+            speaking_rate = len(words) / speaking_time
         res.append({str(i+1): speaking_rate})
 
     return res
 
 
-def sound_to_numpy(sound):
+def sound_to_numpy(sound, is_downsampling=False):
     fs = sound.frame_rate
     # data = np.array(sound.get_array_of_samples()).astype(np.float)
     data = np.array(sound.get_array_of_samples())
     # data = data / 32768.0
-    return data, fs
+
+    if is_downsampling:
+        new_data, new_fs = downsampling(4, data, fs)
+        return new_data, new_fs
+    else:
+        return data, fs
 
 
 def extract_pitch(data, fs):
@@ -133,6 +180,7 @@ def extract_sound_by_person(people_infos, sound):
 
 def extract_info(voice_file, filename, cfg, people_num):
     voice_byte = voice_file.read()
+
     response = get_googleapi_res(voice_byte, people_num)
     people_infos = separate_people(response, people_num)
 
@@ -150,7 +198,7 @@ def extract_info(voice_file, filename, cfg, people_num):
         person_pitches = []
         person_amplitudes = []
         for sound in person_sounds:
-            data, fs = sound_to_numpy(sound)
+            data, fs = sound_to_numpy(sound, is_downsampling=True)
             pitch = extract_pitch(data, fs)
             person_pitches.append(pitch)
             person_amplitudes.append(data.tolist())
