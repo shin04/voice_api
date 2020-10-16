@@ -7,6 +7,8 @@ from mutagen.mp3 import MP3
 import numpy as np
 from scipy import signal
 
+from . import firestore
+
 import os
 import io
 import re
@@ -211,6 +213,8 @@ def extract_info(voice_file, filename, cfg, people_num):
     res['amplitude'] = amplitudes
     res['pitch'] = pitches
     res['speaking_rate'] = speaking_rates
+
+    firestore.upload_results(res, people_num)
 
     return res
 
