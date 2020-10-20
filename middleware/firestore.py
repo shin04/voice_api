@@ -3,32 +3,52 @@ from firebase_admin import credentials
 from firebase_admin import firestore
 
 
-def change_dict_key(d, old_key, new_key, default_value=None):
-    d[new_key] = d.pop(old_key, default_value)
+def upload_speaking_time(arraies, size, doc_ref, field_name):
+    for array in arraies:
+        if type(array) != list:
+            array = [array]
+        doc_ref.update({field_name: firestore.ArrayUnion(array)})
 
 
-# def preprocessing():
-#     # dictのkeyをunicodeに
+def upload_array(arraies, size, doc_ref, field_name):
+    ite = 0
+    for i in range(0, len(arraies), size):
+        field = field_name+str(ite)
+        print(field)
+        print(len(arraies[i:i+size]))
+        doc_ref.update(
+            {field: firestore.ArrayUnion(arraies[i:i+size])})
+        ite += 1
 
 
-def upload_results(results, people_num):
+def upload_results(results, people_num, user_id, record_id):
     # Use a service account
     cred = credentials.Certificate('credentials/service-account.json')
     firebase_admin.initialize_app(cred)
     db = firestore.client()
 
-    doc_ref = db.document(u'users/idid/records/record-id')
+    endpoint = u'users/{}/records/{}/results/voice'.format(
+        user_id, record_id)
+
+    doc_ref = db.document(endpoint)
     doc_ref.set({
-        u'stringExample': u'Hello, World!',
-        u'booleanExample': True,
-        u'numberExample': 3.14159265,
-        u'arrayExample': [5, True, u'hello'],
-        u'nullExample': None,
-        u'objectExample': {
-            u'a': 5,
-            u'b': True
-        }
+        u'speaking_times': [],
+        u'amplitude': [],
+        u'pitch': [],
+        u'speaking_rate': results['speaking_rate']['1']
     })
+
+    upload_speaking_time(results['speaking_time']
+                         [1], 1, doc_ref, 'speaking_time')
+    for i, amplitude in enumerate(results['amplitude']['1']):
+        upload_array(amplitude, 15000, doc_ref, 'amplitude_{}'.format(i))
+
+    # doc_ref.set({
+    #     u'speaking_times': results['speaking_time'],
+    #     u'amplitude': results['amplitude'],
+    #     u'pitch': results['pitch'],
+    #     u'speaking_rate': results['speaking_rate']
+    # })
 
     # if people_num == 1:
     #     doc_ref = db.document(u'users/idid/records/record-id')

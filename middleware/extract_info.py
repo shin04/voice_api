@@ -108,9 +108,8 @@ def separate_people(response, people_num):
 
 
 def get_speaking_time(people_infos):
-    speaking_times = []
+    speaking_times_dict = {}
     for person_infos in people_infos:
-        speaking_times_dict = {}
         speaking_times_dict[person_infos[0]['speaker_tag']] = []
         for person_info in person_infos:
             person_speaking_times = [
@@ -119,13 +118,12 @@ def get_speaking_time(people_infos):
             ]
             speaking_times_dict[person_info["speaker_tag"]].append(
                 person_speaking_times)
-        speaking_times.append(speaking_times_dict)
 
-    return speaking_times
+    return speaking_times_dict
 
 
 def calc_speed(people_infos):
-    res = []
+    res = {}
     for i, person_infos in enumerate(people_infos):
         speaking_time = 0.
         words = ""
@@ -136,7 +134,7 @@ def calc_speed(people_infos):
         speaking_rate = 0.
         if speaking_time != 0.:
             speaking_rate = len(words) / speaking_time
-        res.append({str(i+1): speaking_rate})
+        res[str(i+1)] = speaking_rate
 
     return res
 
@@ -148,7 +146,7 @@ def sound_to_numpy(sound, is_downsampling=False):
     # data = data / 32768.0
 
     if is_downsampling:
-        new_data, new_fs = downsampling(4, data, fs)
+        new_data, new_fs = downsampling(8, data, fs)
         return new_data, new_fs
     else:
         return data, fs
@@ -180,7 +178,7 @@ def extract_sound_by_person(people_infos, sound):
     return sounds
 
 
-def extract_info(voice_file, filename, cfg, people_num):
+def extract_info(voice_file, filename, cfg, people_num, user_id, record_id):
     voice_byte = voice_file.read()
 
     response = get_googleapi_res(voice_byte, people_num)
@@ -194,27 +192,30 @@ def extract_info(voice_file, filename, cfg, people_num):
 
     speaking_times = get_speaking_time(people_infos)
 
-    pitches = []
-    amplitudes = []
+    pitches_dict = {}
+    amplitudes_dict = {}
     for speaker_tag, person_sounds in sounds_by_person.items():
         person_pitches = []
         person_amplitudes = []
+
         for sound in person_sounds:
             data, fs = sound_to_numpy(sound, is_downsampling=True)
             pitch = extract_pitch(data, fs)
+
             person_pitches.append(pitch)
             person_amplitudes.append(data.tolist())
-        pitches.append({speaker_tag: person_pitches})
-        amplitudes.append({speaker_tag: person_amplitudes})
+
+        pitches_dict[str(speaker_tag)] = person_pitches
+        amplitudes_dict[str(speaker_tag)] = person_amplitudes
 
     res = {}
 
     res['speaking_time'] = speaking_times
-    res['amplitude'] = amplitudes
-    res['pitch'] = pitches
+    res['amplitude'] = amplitudes_dict
+    res['pitch'] = pitches_dict
     res['speaking_rate'] = speaking_rates
 
-    firestore.upload_results(res, people_num)
+    firestore.upload_results(res, people_num, user_id, record_id)
 
     return res
 

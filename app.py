@@ -29,6 +29,9 @@ def hello():
 
 @app.route('/analyze', methods=['POST'])
 def analyze():
+    user_id = request.form['user_id']
+    record_id = request.form['record_id']
+
     if 'people_num' not in request.form:
         abort(400, {'message': 'parameter [people_num] is not found'})
     elif request.form['people_num'] == '':
@@ -45,7 +48,7 @@ def analyze():
     if voice_file and allwed_file(voice_file.filename, app.config):
         filename = voice_file.filename
         res = extract_info.extract_info(
-            voice_file, filename, app.config, people_num)
+            voice_file, filename, app.config, people_num, user_id, record_id)
         return jsonify(res)
     elif allwed_file(voice_file.filename, app.config):
         abort(400, {'message': 'extension is invalid'})
